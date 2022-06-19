@@ -13,7 +13,7 @@ module.exports.getUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400)
-          .send({ message: 'Пользователь по указанному _id не найден' });
+          .send({ message: 'Переданы некорректные данные' });
       }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
@@ -32,7 +32,7 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400)
-          .send({ message: `Переданы некорректные данные при создании пользователя - ${err.message}` });
+          .send({ message: `Переданы некорректные данные - ${err.message}` });
       } return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
@@ -51,7 +51,7 @@ module.exports.updateProfile = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400)
-          .send({ message: 'Переданы некорректные данные при обновлении профиля' });
+          .send({ message: 'Переданы некорректные данные' });
       }
       /*
       if (err.name === 'CastError') {
@@ -76,8 +76,8 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(404)
-          .send({ message: 'Переданы некорректные данные при обновлении аватара' });
+        return res.status(400)
+          .send({ message: 'Переданы некорректные данные' });
       }
       /*
       if (err.name === 'CastError') {
