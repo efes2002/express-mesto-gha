@@ -56,8 +56,8 @@ module.exports.updateProfile = (req, res) => {
       }
       */
       if (err.name === 'CastError') {
-        return res.status(404)
-          .send({ message: 'Пользователь по указанному _id не найден' });
+        return res.status(400)
+          .send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
