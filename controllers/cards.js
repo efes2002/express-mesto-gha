@@ -4,7 +4,7 @@ module.exports.getCards = (req, res) => {
   Card.find({})
     .populate('owner')
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -16,7 +16,7 @@ module.exports.createCard = (req, res) => {
       if (err.name === 'ValidationError') {
         return res.status(400)
           .send({ message: 'Переданы некорректные данные при создании карточки' });
-      } return res.status(500).send({ message: err.message });
+      } return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -25,7 +25,7 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res.status(404)
-          .send({ message: 'Передан некорректный _id каточки' });
+          .send({ message: 'Карточка не найдена' });
       } else {
         res.send(card);
       }
@@ -34,7 +34,7 @@ module.exports.deleteCard = (req, res) => {
       if (err.name === 'CastError') {
         return res.status(400)
           .send({ message: 'Карточка с указанным _id не найдена' });
-      } return res.status(500).send({ message: err.message });
+      } return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
@@ -47,7 +47,7 @@ module.exports.likeCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res.status(404)
-          .send({ message: 'Передан некорректный _id каточки' });
+          .send({ message: 'Карточка не найдена' });
       } else {
         res.send(card);
       }
@@ -57,20 +57,20 @@ module.exports.likeCard = (req, res) => {
         return res.status(400)
           .send({ message: 'Передан несуществующий _id карточки' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
         res.status(404)
-          .send({ message: 'Передан некорректный _id каточки' });
+          .send({ message: 'Карточка не найдена' });
       } else {
         res.send(card);
       }
@@ -80,6 +80,6 @@ module.exports.dislikeCard = (req, res) => {
         return res.status(400)
           .send({ message: 'Передан несуществующий _id карточки' });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
