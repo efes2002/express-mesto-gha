@@ -49,16 +49,16 @@ module.exports.updateProfile = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      /*
       if (err.name === 'ValidationError') {
         return res.status(400)
           .send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
-      */
+      /*
       if (err.name === 'CastError') {
         return res.status(400)
           .send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
+      */
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
 };
