@@ -31,7 +31,7 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(404)
+        return res.status(400)
           .send({ message: `Переданы некорректные данные при создании пользователя - ${err.message}` });
       } return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
@@ -51,12 +51,12 @@ module.exports.updateProfile = (req, res) => {
     .catch((err) => {
       /*
       if (err.name === 'ValidationError') {
-        return res.status(404)
+        return res.status(400)
           .send({ message: 'Переданы некорректные данные при обновлении профиля' });
       }
       */
       if (err.name === 'CastError') {
-        return res.status(400)
+        return res.status(404)
           .send({ message: 'Пользователь по указанному _id не найден' });
       }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
