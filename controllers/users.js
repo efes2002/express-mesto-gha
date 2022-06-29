@@ -1,7 +1,9 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+function getUserById(req, res, id) {
+  return User.findById(id)
     .then((user) => {
       if (!user) {
         res.status(404)
@@ -17,6 +19,11 @@ module.exports.getUser = (req, res) => {
       }
       return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
     });
+}
+
+module.exports.getUser = (req, res) => {
+  const id = req.params.userId;
+  return getUserById(req, res, id);
 };
 
 module.exports.getUsers = (req, res) => {
@@ -25,9 +32,27 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера' }));
 };
 
+module.exports.getUserMe = (req, res) => {
+  const id = req.user._id;
+  return getUserById(req, res, id);
+};
+
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
+  const {
+    email,
+    password,
+    name,
+    about,
+    avatar,
+  } = req.body;
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    }))
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -67,6 +92,40 @@ module.exports.updateAvatar = (req, res) => {
           .send({ message: 'Пользователь не найден' });
       }
       res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        return res.status(400)
+          .send({ message: 'Переданы некорректные данные' });
+      }
+      return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        return res.status(401)
+          .send({ message: 'Неправильные почта или пароль' });
+      }
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            res.status(401)
+              .send({ message: 'Неправильные почта или пароль' });
+          } else {
+            const token = jwt.sign(
+              { _id: user._id },
+              'some-secret-key',
+              { expiresIn: '7d' },
+            );
+            res.status(200)
+              .cookie('jwt', token, { maxAge: 3600000 * 24 * 7, httpOnly: true })
+              .send({ message: 'Всё верно!' });
+          }
+        });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
