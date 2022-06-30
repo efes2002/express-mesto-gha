@@ -21,15 +21,31 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.id)
-    .then((card) => {
-      if (!card) {
-        res.status(404)
-          .send({ message: 'Карточка не найдена' });
-      } else {
-        res.send(card);
-      }
-    })
+  Card.findById(req.params.id).then((card) => {
+    if (!card) {
+      res.status(404)
+        .send({ message: 'Карточка не найдена' });
+    } else if (card.owner.toString() === req.user._id) {
+      Card.findByIdAndRemove(req.params.id)
+        .then((item) => {
+          if (!item) {
+            res.status(404)
+              .send({ message: 'Карточка не найдена' });
+          } else {
+            res.send(item);
+          }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            return res.status(400)
+              .send({ message: 'Переданы некорректные данные' });
+          }
+          return res.status(500).send({ message: 'Внутренняя ошибка сервера' });
+        });
+    } else {
+      res.status(400).send({ message: 'Переданы некорректные данные' });
+    }
+  })
     .catch((err) => {
       if (err.name === 'CastError') {
         return res.status(400)
