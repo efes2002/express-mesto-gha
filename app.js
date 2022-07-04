@@ -7,7 +7,6 @@ const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const customUrlValidationJoi = require('./utils/customUrlValidationJoi');
 
-
 const { PORT = 3000 } = process.env;
 
 const app = express();
