@@ -56,7 +56,7 @@ module.exports.createUser = (req, res, next) => {
       avatar,
     }))
     .then((user) => {
-      const newUser = { ...user };
+      const newUser = user.toObject();
       if (newUser.password) { delete newUser.password; }
       return res.send(newUser);
     })
