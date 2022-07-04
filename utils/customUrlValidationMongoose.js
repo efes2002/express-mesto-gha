@@ -1,3 +1,5 @@
-const REGEXP_URL = require('./constants');
+const { REGEXP_URL } = require('./constants');
 
-module.exports = (url) => REGEXP_URL.test(url);
+const customUrlValidationMongoose = (url) => REGEXP_URL.test(url);
+
+module.exports = customUrlValidationMongoose;

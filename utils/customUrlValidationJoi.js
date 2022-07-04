@@ -1,4 +1,4 @@
-const REGEXP_URL = require('./constants');
+const { REGEXP_URL } = require('./constants');
 
 const customUrlValidationJoi = (url, helpers) => {
   if (REGEXP_URL.test(url)) {
