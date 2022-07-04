@@ -29,6 +29,17 @@ app.use((req, res) => {
     .send({ message: 'Страница не найдена - 404' });
 });
 
+app.use((err, req, res) => {
+  const { statusCode = 500, message } = err;
+
+  res.status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'Внутренняя ошибка сервера'
+        : message,
+    });
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });
