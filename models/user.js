@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 const customUrlValidationMongoose = require('../utils/customUrlValidationMongoose');
 
 const userSchema = new mongoose.Schema({
@@ -6,8 +7,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    validate: {
+      validator(email) {
+        return validator.isEmail(email);
+      },
+    },
   },
   password: {
     type: String,

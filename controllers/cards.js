@@ -14,7 +14,7 @@ module.exports.createCard = (req, res, next) => {
   const owner = req.user._id;
   const { name, link } = req.body;
   Card.create({ name, link, owner })
-    .then((card) => res.send(card))
+    .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`Переданы некорректные данные - ${err.message}`));
@@ -42,7 +42,7 @@ module.exports.deleteCard = (req, res, next) => {
           return next(err);
         });
     } else {
-      next(new ForbiddenError('Переданы некорректные данные'));
+      next(new ForbiddenError('Карточка не принадлежит этому id'));
     }
   })
     .catch((err) => {

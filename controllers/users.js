@@ -58,13 +58,13 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const newUser = user.toObject();
       if (newUser.password) { delete newUser.password; }
-      return res.send(newUser);
+      return res.status(201).send(newUser);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return next(new BadRequestError(`Переданы некорректные данные - ${err.message}`));
       } if (err.code === 11000) {
-        return next(new ConflictError(`Переданы некорректные данные - ${err.message}`));
+        return next(new ConflictError('Email занят'));
       }
       return next(err);
     });
@@ -91,7 +91,7 @@ module.exports.updateProfile = (req, res, next) => {
 module.exports.updateAvatar = (req, res, next) => {
   const userId = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true })
+  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('Пользователь не найден'));
@@ -129,10 +129,5 @@ module.exports.login = (req, res, next) => {
           }
         });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Переданы некорректные данные'));
-      }
-      return next(err);
-    });
+    .catch(next);
 };
